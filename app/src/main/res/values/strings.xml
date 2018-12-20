@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">numple3</string>
+    <string name="app_name">数独ソルバー</string>
+    <string name="button">Button</string>
 </resources>
