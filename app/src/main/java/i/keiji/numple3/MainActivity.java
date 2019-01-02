@@ -2,8 +2,8 @@ package i.keiji.numple3;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -13,77 +13,99 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
-    protected Button spinnerButton;
-    protected AlertDialog alertDialog;
-    protected ArrayAdapter<String> adapter;
-    protected int selectedIndex = 0;
+    private ArrayAdapter<String> adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_single_choice);
-        adapter.add("1");
-        adapter.add("2");
-        adapter.add("3");
-        adapter.add("4");
-        adapter.add("5");
-        adapter.add("6");
-        adapter.add("7");
-        adapter.add("8");
-        adapter.add("9");
-        adapter.add("");
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_single_choice);
 
-        // データ生成
-        for (int j = 1; j <= 9; j++) {
-            LinearLayout linearLayout = new LinearLayout(this);
-            linearLayout.setOrientation(LinearLayout.HORIZONTAL);
-            for (int i = 1; i <= 9; i++) {
-                Button button = new Button(this);
-                button.setTag(String.valueOf(j+":"+i));
-                button.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
-                button.setOnClickListener(onClickListener);
-                spinnerButton = button;
-                linearLayout.addView(button);
-            }
-            LinearLayout liner = findViewById(R.id.numple);
-            liner.addView(linearLayout);
+        String[] selectArray = { "","1","2","3","4","5","6","7","8","9" };
+        for (String item : selectArray) {
+            // ArrayAdapterにitemを追加する
+            adapter.add(item);
         }
 
-        // クリックイベントを取得したいボタン
-        Button button = (Button) findViewById(R.id.start);
+        /* 以下と同じ処理を表す
+        for (int i = 0; i < selectArray.length; i++){
+            // ArrayAdapterにitemを追加する
+            adapter.add(selectArray[i]);
+        }
+        */
 
-        // ボタンに OnClickListener インターフェースを実装する
-        button.setOnClickListener(new View.OnClickListener() {
+        // データ生成
+        makeButton();
+
+        // 処理開始イベント
+        Button startButton = findViewById(R.id.start_button);
+        //スタートボタンに OnClickListener インターフェースを実装する
+        startButton.setOnClickListener(new View.OnClickListener() {
 
             // クリック時に呼ばれるメソッド
             @Override
             public void onClick(View view) {
+                //TODO ナンプレ解答処理の追加
                 Toast.makeText(MainActivity.this, "処理を開始します", Toast.LENGTH_LONG).show();
             }
         });
+
+
+        //リセットイベント
+        Button clearButton = findViewById(R.id.clear_button);
+        //リセットボタンにOnClickListener インターフェースを実装する
+        clearButton.setOnClickListener(new View.OnClickListener() {
+
+            // クリック時に呼ばれるメソッド
+            @Override
+            public void onClick(View view) {
+                // コンテンツ部分のLayoutを取ってくる
+                LinearLayout linearLayout = findViewById(R.id.numple_layout);
+                // 内容を全部消す
+                linearLayout.removeAllViews();
+                makeButton();
+                Toast.makeText(MainActivity.this, "リセットしました", Toast.LENGTH_LONG).show();
+            }
+        });
     }
+
     private View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
-        public void onClick(View v) {
+        public void onClick(final View v) {
             // AlertDialogで選択肢を表示
             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
             builder.setTitle("数値を選択してください");
-            builder.setSingleChoiceItems(adapter, selectedIndex, onDialogClickListener);
-            alertDialog = builder.create();
+
+            builder.setSingleChoiceItems(adapter, 0, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Log.d("tag", v.getTag().toString());
+                    ((Button) v).setText(adapter.getItem(which));
+                    dialog.dismiss();
+                }
+            });
+
+            AlertDialog alertDialog = builder.create();
             alertDialog.show();
         }
     };
-    private DialogInterface.OnClickListener onDialogClickListener = new DialogInterface.OnClickListener() {
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-            // AlertDialogで選択された内容を保持
-            selectedIndex = which;
-            Log.d("tag", spinnerButton.getTag().toString());
-            spinnerButton.setText(adapter.getItem(which));
-            alertDialog.dismiss();
+
+    private void makeButton() {
+        int buttonTagNum = 1;
+        for (int i = 1; i <= 9; i++) {
+            LinearLayout linearLayout = new LinearLayout(this);
+            linearLayout.setOrientation(LinearLayout.HORIZONTAL);
+            for (int j = 1; j <= 9; j++) {
+                Button button = new Button(this);
+                button.setTag(buttonTagNum);
+                button.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+                button.setOnClickListener(onClickListener);
+                linearLayout.addView(button);
+                buttonTagNum++;
+            }
+            LinearLayout layout = findViewById(R.id.numple_layout);
+            layout.addView(linearLayout);
         }
-    };
+    }
 }
