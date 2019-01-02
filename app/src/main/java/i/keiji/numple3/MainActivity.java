@@ -13,15 +13,27 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ArrayAdapter<CharSequence> adapter;
+    private ArrayAdapter<String> adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // strings.xmlから配列読み込んでadapterに適用
-        adapter = ArrayAdapter.createFromResource(this, R.array.select_array, android.R.layout.simple_list_item_single_choice);
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_single_choice);
+
+        String[] selectArray = { "","1","2","3","4","5","6","7","8","9" };
+        for (String item : selectArray) {
+            // ArrayAdapterにitemを追加する
+            adapter.add(item);
+        }
+
+        /* 以下と同じ処理を表す
+        for (int i = 0; i < selectArray.length; i++){
+            // ArrayAdapterにitemを追加する
+            adapter.add(selectArray[i]);
+        }
+        */
 
         // データ生成
         makeButton();
